@@ -1,6 +1,6 @@
 import argparse
 from netmiko import ConnectHandler
-from utils import SSHTEL_CONNECTION, COM_CONNECTION, TFTP_CONNECTION, read_nmconn, create_nmconn
+from NetManage.utils import SSHTEL_CONNECTION, COM_CONNECTION, TFTP_CONNECTION, read_nmconn, create_nmconn
 
 
 def read_config(connection: str, output_file: str | None, show_config: bool | None):
