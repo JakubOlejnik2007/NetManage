@@ -75,7 +75,35 @@ def read_nmconn(file: str) -> COM_CONNECTION | SSHTEL_CONNECTION | TFTP_CONNECTI
         else:
             raise AttributeError("Unknown or unhandled connection type.")
 
+def create_nmconn(name, output, method, device, ip, port, username, password, exec, baudrate):
+    if output is not None:
+        with open(output, 'w+', encoding="UTF-8") as f:
+            f.writelines([
+                "-- META\n",
+                f"NAME: {name}\n",
+                f"METHOD: {method}\n",
+            ])
 
+            if method == "COM":
+                f.writelines([
+                    "-- DATA\n",
+                    f"PORT: {port}\n",
+                    f"BAUDRATE: {baudrate}\n",
+                    f"EXECPASS: {exec}\n",
+                ])
+            elif method == "SSH" or method == "TELNET":
+                f.writelines([
+                    "-- DATA\n",
+                    f"HOST: {ip}\n",
+                    f"PORT: {port}\n",
+                    f"USERNAME: {username}\n",
+                    f"PASSWORD: {password}\n",
+                    f"EXECPASS: {exec}\n",
+                ])
+            f.writelines([
+                "-- DEVICE\n",
+                f"DEVICE: {device}\n"
+            ])
 
 if __name__ == '__main__':
     read_nmconn("switch_com.nmconn")

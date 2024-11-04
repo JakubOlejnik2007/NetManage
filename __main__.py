@@ -1,6 +1,7 @@
 import argparse
 from netmiko import ConnectHandler
-from nmfilesparser import SSHTEL_CONNECTION, COM_CONNECTION, TFTP_CONNECTION, read_nmconn
+from utils import SSHTEL_CONNECTION, COM_CONNECTION, TFTP_CONNECTION, read_nmconn, create_nmconn
+
 
 def read_config(connection: str, output_file: str | None, show_config: bool | None):
     connection = read_nmconn(connection)
@@ -44,34 +45,9 @@ def read_config(connection: str, output_file: str | None, show_config: bool | No
         net_connect.disconnect()
 
 def create_connection(name, output, method, device, ip, port, username, password, exec, baudrate):
-    if output is not None:
-        with open(output, 'w+', encoding="UTF-8") as f:
-            f.writelines([
-                "-- META\n",
-                f"NAME: {name}\n",
-                f"METHOD: {method}\n",
-            ])
-
-            if method == "COM":
-                f.writelines([
-                    "-- DATA\n",
-                    f"PORT: {port}\n",
-                    f"BAUDRATE: {baudrate}\n",
-                    f"EXECPASS: {exec}\n",
-                ])
-            elif method == "SSH" or method == "TELNET":
-                f.writelines([
-                    "-- DATA\n",
-                    f"HOST: {ip}\n",
-                    f"PORT: {port}\n",
-                    f"USERNAME: {username}\n",
-                    f"PASSWORD: {password}\n",
-                    f"EXECPASS: {exec}\n",
-                ])
-            f.writelines([
-                "-- DEVICE\n",
-                f"DEVICE: {device}\n"
-            ])
+    if not((method == "COM" and port is not None and baudrate is not None) or ((method == "SSH" or method == "TELNET") and ip is not None and port is not None and username is not None and password is not None)):
+        raise AttributeError("Method must be either COM or SSH or TELNET and certain data need to be provided.")
+    create_nmconn(name, output, method, device, ip, port, username, password, exec, baudrate)
 
 def main():
     parser = argparse.ArgumentParser(description='NetManage')

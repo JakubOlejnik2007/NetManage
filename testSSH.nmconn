@@ -1,0 +1,11 @@
+-- META
+NAME: Testowe połączenie
+METHOD: SSH
+-- DATA
+HOST: 192.168.1.1
+PORT: 22
+USERNAME: admin
+PASSWORD: admin
+EXECPASS: None
+-- DEVICE
+DEVICE: cisco_ios
