@@ -6,15 +6,21 @@ class COM_CONNECTION:
         self.DEVICE = data["DEVICE"]+"_serial"
         self.EXECPASS = data["EXECPASS"] if data.get("EXECPASS") else ""
 
+    def __str__(self):
+        print(self.METHOD, self.PORT, self.BAUDRATE, self.DEVICE, self.EXECPASS)
 
 class SSHTEL_CONNECTION:
     def __init__(self, data: dict):
-        self.METHOD = "COM"
+        self.METHOD = data["METHOD"]
+        self.HOST = data["HOST"]
         self.PORT = data["PORT"]
-        self.BAUDRATE = data["BAUDRATE"]
-        self.DEVICE = data["DEVICE"] + "_serial"
+        self.USERNAME = data["USERNAME"]
+        self.PASSWORD = data["PASSWORD"]
+        self.DEVICE = data["DEVICE"] + ("" if self.METHOD == "SSH" else "_telnet")
         self.EXECPASS = data["EXECPASS"] if data.get("EXECPASS") else ""
 
+    def __str__(self):
+        print(self.METHOD, self.HOST, self.PORT, self.USERNAME, self.PASSWORD, self.EXECPASS)
 
 class TFTP_CONNECTION:
     pass
@@ -39,6 +45,8 @@ def read_nmconn(file: str) -> COM_CONNECTION | SSHTEL_CONNECTION | TFTP_CONNECTI
                 raise AttributeError("Expected more data.")
             return COM_CONNECTION(conn_data)
         elif conn_data.get("METHOD") == "SSH" or conn_data.get("METHOD") == "TELNET":
+            if conn_data.get("HOST") is None or conn_data.get("PORT") is None or conn_data.get("USERNAME") is None or conn_data.get("PASSWORD") is None:
+                raise AttributeError("Expected more data.")
             return SSHTEL_CONNECTION(conn_data)
         elif conn_data.get("METHOD") == "TFTP":
             return TFTP_CONNECTION()
@@ -46,4 +54,4 @@ def read_nmconn(file: str) -> COM_CONNECTION | SSHTEL_CONNECTION | TFTP_CONNECTI
             raise AttributeError("Unknown or unhandled connection type.")
 
 if __name__ == '__main__':
-    read_nmconn("switch.nmconn")
+    read_nmconn("switch_com.nmconn")
