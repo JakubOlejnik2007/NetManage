@@ -43,6 +43,35 @@ def read_config(connection: str, output_file: str | None, show_config: bool | No
 
         net_connect.disconnect()
 
+def create_connection(name, output, method, device, ip, port, username, password, exec, baudrate):
+    if output is not None:
+        with open(output, 'w+', encoding="UTF-8") as f:
+            f.writelines([
+                "-- META\n",
+                f"NAME: {name}\n",
+                f"METHOD: {method}\n",
+            ])
+
+            if method == "COM":
+                f.writelines([
+                    "-- DATA\n",
+                    f"PORT: {port}\n",
+                    f"BAUDRATE: {baudrate}\n",
+                    f"EXECPASS: {exec}\n",
+                ])
+            elif method == "SSH" or method == "TELNET":
+                f.writelines([
+                    "-- DATA\n",
+                    f"HOST: {ip}\n",
+                    f"PORT: {port}\n",
+                    f"USERNAME: {username}\n",
+                    f"PASSWORD: {password}\n",
+                    f"EXECPASS: {exec}\n",
+                ])
+            f.writelines([
+                "-- DEVICE\n",
+                f"DEVICE: {device}\n"
+            ])
 
 def main():
     parser = argparse.ArgumentParser(description='NetManage')
@@ -54,6 +83,21 @@ def main():
     parser_read_config.add_argument('-o', '--output', type=str, required=False, help='Path to output .txt file')
     parser_read_config.add_argument('-s', '--show-config', type=bool, required=False, help='Show output in console')
 
+    # create .nmconn file
+
+    parser_create_connection = subparsers.add_parser('create-conn', help='Create connection')
+    parser_create_connection.add_argument('-n', '--name', type=str, required=True, help='Connection name')
+    parser_create_connection.add_argument('-o', '--output', type=str, required=True, help='Path to .nmconn file')
+    parser_create_connection.add_argument('-m', '--method', type=str, required=True, help='Method: SSH, TELNET, COM, TFTP')
+    parser_create_connection.add_argument('-d', '--device', type=str, required=True, help='Device_type z bilbioteki netmiko')
+    parser_create_connection.add_argument('-i', '--ip', type=str, required=False, help='[SSH/TELNET] Host')
+    parser_create_connection.add_argument('-po', '--port', type=str, required=False, help='[SSH/TELNET/COM] PORT')
+    parser_create_connection.add_argument('-b', '--baudrate', type=int, required=False, help='[COM] Baudrate')
+    parser_create_connection.add_argument('-u', '--username', type=str, required=False, help='[SSH/TELNET] Username')
+    parser_create_connection.add_argument('-pa', '--password', type=str, required=False, help='[SSH/TELNET] Password')
+    parser_create_connection.add_argument('-e', '--exec', type=str, required=False, help='[SSH/TELNET/COM] EXEC')
+
+
     args = parser.parse_args()
 
     if args.command == "read-config":
@@ -62,7 +106,12 @@ def main():
         )
 
         read_config(args.connection, args.output, args.show_config)
+    elif args.command == "create-conn":
+        print(
+            args.name, args.output, args.method, args.device, args.ip, args.port, args.username, args.password, args.exec, args.baudrate
+        )
 
+        create_connection(args.name, args.output, args.method, args.device, args.ip, args.port, args.username, args.password, args.exec, args.baudrate)
     else:
         parser.print_help()
 

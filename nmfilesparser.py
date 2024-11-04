@@ -75,5 +75,7 @@ def read_nmconn(file: str) -> COM_CONNECTION | SSHTEL_CONNECTION | TFTP_CONNECTI
         else:
             raise AttributeError("Unknown or unhandled connection type.")
 
+
+
 if __name__ == '__main__':
     read_nmconn("switch_com.nmconn")
