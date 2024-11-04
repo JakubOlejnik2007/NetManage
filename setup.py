@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="NetManage",
-    version="0.1",
+    version="0.1.1",
     packages=find_packages(),
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -20,7 +20,7 @@ setup(
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
-            'NetManage=netmanage.__main__:main',
+            'NetManage=__main__:main',
         ],
     },
 )
