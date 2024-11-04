@@ -9,6 +9,18 @@ class COM_CONNECTION:
     def __str__(self):
         print(self.METHOD, self.PORT, self.BAUDRATE, self.DEVICE, self.EXECPASS)
 
+    def getNetmikoConnDict(self):
+        return {
+            'device_type': self.DEVICE,
+            'serial_settings': {
+                'port': self.PORT,
+                'baudrate': self.BAUDRATE,
+            },
+            'username': '',
+            'password': '',
+            'secret': self.EXECPASS,
+        }
+
 class SSHTEL_CONNECTION:
     def __init__(self, data: dict):
         self.METHOD = data["METHOD"]
@@ -21,6 +33,16 @@ class SSHTEL_CONNECTION:
 
     def __str__(self):
         print(self.METHOD, self.HOST, self.PORT, self.USERNAME, self.PASSWORD, self.EXECPASS)
+
+    def getNetmikoConnDict(self):
+        return {
+            'device_type': self.DEVICE,
+            'host': self.HOST,
+            'port': self.PORT,
+            'username': self.USERNAME,
+            'password': self.PASSWORD,
+            'secret': self.EXECPASS,
+        }
 
 class TFTP_CONNECTION:
     pass
