@@ -1,5 +1,5 @@
 import argparse
-from netmiko import ConnectHandler
+from netmiko import ConnectHandler, NetmikoTimeoutException, NetmikoAuthenticationException
 from NetManage.utils import SSHTEL_CONNECTION, COM_CONNECTION, TFTP_CONNECTION, read_nmconn, create_nmconn
 
 
@@ -49,6 +49,24 @@ def create_connection(name, output, method, device, ip, port, username, password
         raise AttributeError("Method must be either COM or SSH or TELNET and certain data need to be provided.")
     create_nmconn(name, output, method, device, ip, port, username, password, exec, baudrate)
 
+def test_connection(connectionFile):
+    conn = read_nmconn(connectionFile)
+    connection_data = conn.getNetmikoConnDict()
+
+    try:
+        connection = ConnectHandler(**connection_data)
+        print("Success")
+        connection.disconnect()
+
+    except NetmikoTimeoutException:
+        print("Error: request timed out")
+
+    except NetmikoAuthenticationException:
+        print("Error: wrong login or password")
+
+    except Exception as e:
+        print(f"Error: {e}")
+
 def main():
     parser = argparse.ArgumentParser(description='NetManage')
     subparsers = parser.add_subparsers(dest='command')
@@ -73,6 +91,10 @@ def main():
     parser_create_connection.add_argument('-pa', '--password', type=str, required=False, help='[SSH/TELNET] Password')
     parser_create_connection.add_argument('-e', '--exec', type=str, required=False, help='[SSH/TELNET/COM] EXEC')
 
+    # test connection
+
+    parser_test_connection = subparsers.add_parser('test-conn', help='Test connection')
+    parser_test_connection.add_argument('-c', '--connection', type=str, required=True, help='Path to .nmconn file')
 
     args = parser.parse_args()
 
@@ -88,6 +110,8 @@ def main():
         )
 
         create_connection(args.name, args.output, args.method, args.device, args.ip, args.port, args.username, args.password, args.exec, args.baudrate)
+    elif args.command == "test-conn":
+        test_connection(args.connection)
     else:
         parser.print_help()
 
