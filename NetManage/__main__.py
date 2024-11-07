@@ -1,6 +1,6 @@
 import argparse
 from netmiko import ConnectHandler, NetmikoTimeoutException, NetmikoAuthenticationException
-from NetManage.utils import SSHTEL_CONNECTION, COM_CONNECTION, TFTP_CONNECTION, read_nmconn, create_nmconn
+from utils import SSH_CONNECTION, TELNET_CONNECTION, COM_CONNECTION, TFTP_CONNECTION, read_nmconn, create_nmconn
 
 
 def read_config(connection: str, output_file: str | None, show_config: bool | None):
@@ -45,9 +45,14 @@ def read_config(connection: str, output_file: str | None, show_config: bool | No
         net_connect.disconnect()
 
 def create_connection(name, output, method, device, ip, port, username, password, exec, baudrate):
-    if not((method == "COM" and port is not None and baudrate is not None) or ((method == "SSH" or method == "TELNET") and ip is not None and port is not None and username is not None and password is not None)):
-        raise AttributeError("Method must be either COM or SSH or TELNET and certain data need to be provided.")
-    create_nmconn(name, output, method, device, ip, port, username, password, exec, baudrate)
+    try:
+        if not((method == "COM" and port is not None and baudrate is not None) or ((method == "SSH" or method == "TELNET") and ip is not None and port is not None and (username is not None or method == "TELNET") and password is not None)):
+            raise AttributeError("Method must be either COM or SSH or TELNET and certain data need to be provided.")
+        create_nmconn(name, output, method, device, ip, port, username, password, exec, baudrate)
+        print("Success")
+    except Exception as e:
+        print(e)
+        print("Fail")
 
 def test_connection(connectionFile):
     conn = read_nmconn(connectionFile)

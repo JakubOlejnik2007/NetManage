@@ -21,14 +21,14 @@ class COM_CONNECTION:
             'secret': self.EXECPASS,
         }
 
-class SSHTEL_CONNECTION:
+class SSH_CONNECTION:
     def __init__(self, data: dict):
         self.METHOD = data["METHOD"]
         self.HOST = data["HOST"]
         self.PORT = data["PORT"]
         self.USERNAME = data["USERNAME"]
         self.PASSWORD = data["PASSWORD"]
-        self.DEVICE = data["DEVICE"] + ("" if self.METHOD == "SSH" else "_telnet")
+        self.DEVICE = data["DEVICE"]
         self.EXECPASS = data["EXECPASS"] if data.get("EXECPASS") else ""
 
     def __str__(self):
@@ -44,10 +44,31 @@ class SSHTEL_CONNECTION:
             'secret': self.EXECPASS,
         }
 
+class TELNET_CONNECTION:
+    def __init__(self, data: dict):
+        self.METHOD = data["METHOD"]
+        self.HOST = data["HOST"]
+        self.PORT = data["PORT"]
+        self.PASSWORD = data["PASSWORD"]
+        self.DEVICE = data["DEVICE"] + "_telnet"
+        self.EXECPASS = data["EXECPASS"] if data.get("EXECPASS") else ""
+
+    def __str__(self):
+        print(self.METHOD, self.HOST, self.PORT, self.PASSWORD, self.EXECPASS)
+
+    def getNetmikoConnDict(self):
+        return {
+            'device_type': self.DEVICE,
+            'host': self.HOST,
+            'port': self.PORT,
+            'password': self.PASSWORD,
+            'secret': self.EXECPASS,
+        }
+
 class TFTP_CONNECTION:
     pass
 
-def read_nmconn(file: str) -> COM_CONNECTION | SSHTEL_CONNECTION | TFTP_CONNECTION:
+def read_nmconn(file: str) -> COM_CONNECTION | SSH_CONNECTION | TELNET_CONNECTION | TFTP_CONNECTION:
     with open(file, 'r') as f:
         lines = f.readlines()
         conn_data = {}
@@ -66,10 +87,16 @@ def read_nmconn(file: str) -> COM_CONNECTION | SSHTEL_CONNECTION | TFTP_CONNECTI
             if conn_data.get("PORT") is None or conn_data.get("BAUDRATE") is None:
                 raise AttributeError("Expected more data.")
             return COM_CONNECTION(conn_data)
-        elif conn_data.get("METHOD") == "SSH" or conn_data.get("METHOD") == "TELNET":
-            if conn_data.get("HOST") is None or conn_data.get("PORT") is None or conn_data.get("USERNAME") is None or conn_data.get("PASSWORD") is None:
+        elif conn_data.get("METHOD") == "SSH":
+            if conn_data.get("HOST") is None or conn_data.get("PORT") is None or conn_data.get("USERNAME") or conn_data.get("PASSWORD") is None:
                 raise AttributeError("Expected more data.")
-            return SSHTEL_CONNECTION(conn_data)
+            return SSH_CONNECTION(conn_data)
+
+        elif conn_data.get("METHOD") == "TELNET":
+            if conn_data.get("HOST") is None or conn_data.get("PORT") is None or conn_data.get("PASSWORD") is None:
+                raise AttributeError("Expected more data.")
+            return TELNET_CONNECTION(conn_data)
+
         elif conn_data.get("METHOD") == "TFTP":
             return TFTP_CONNECTION()
         else:
@@ -91,12 +118,20 @@ def create_nmconn(name, output, method, device, ip, port, username, password, ex
                     f"BAUDRATE: {baudrate}\n",
                     f"EXECPASS: {exec}\n",
                 ])
-            elif method == "SSH" or method == "TELNET":
+            elif method == "SSH":
                 f.writelines([
                     "-- DATA\n",
                     f"HOST: {ip}\n",
                     f"PORT: {port}\n",
                     f"USERNAME: {username}\n",
+                    f"PASSWORD: {password}\n",
+                    f"EXECPASS: {exec}\n",
+                ])
+            elif method == "TELNET":
+                f.writelines([
+                    "-- DATA\n",
+                    f"HOST: {ip}\n",
+                    f"PORT: {port}\n",
                     f"PASSWORD: {password}\n",
                     f"EXECPASS: {exec}\n",
                 ])
