@@ -95,7 +95,7 @@ def read_nmconn(file: str) -> COM_CONNECTION | SSH_CONNECTION | TELNET_CONNECTIO
             print(conn_data.get("USERNAME"), conn_data.get("USERNAME") is None)
             print(conn_data.get("PASSWORD"), conn_data.get("PASSWORD") is None)
 
-            if conn_data.get("HOST") is None or conn_data.get("PORT") is None or conn_data.get("USERNAME") or conn_data.get("PASSWORD") is None:
+            if conn_data.get("HOST") is None or conn_data.get("PORT") is None or conn_data.get("USERNAME") is None or conn_data.get("PASSWORD") is None:
                 raise AttributeError("Expected more data.")
             return SSH_CONNECTION(conn_data)
 
