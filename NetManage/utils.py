@@ -84,15 +84,26 @@ def read_nmconn(file: str) -> COM_CONNECTION | SSH_CONNECTION | TELNET_CONNECTIO
             raise ValueError("DEVICE is not defined")
 
         if conn_data.get("METHOD") == "COM":
+            print(conn_data.get("PORT"), conn_data.get("PORT") is None)
+            print(conn_data.get("BAUDRATE"), conn_data.get("BAUDRATE") is None)
             if conn_data.get("PORT") is None or conn_data.get("BAUDRATE") is None:
                 raise AttributeError("Expected more data.")
             return COM_CONNECTION(conn_data)
         elif conn_data.get("METHOD") == "SSH":
+            print(conn_data.get("HOST"), conn_data.get("HOST") is None)
+            print(conn_data.get("PORT"), conn_data.get("PORT") is None)
+            print(conn_data.get("USERNAME"), conn_data.get("USERNAME") is None)
+            print(conn_data.get("PASSWORD"), conn_data.get("PASSWORD") is None)
+
             if conn_data.get("HOST") is None or conn_data.get("PORT") is None or conn_data.get("USERNAME") or conn_data.get("PASSWORD") is None:
                 raise AttributeError("Expected more data.")
             return SSH_CONNECTION(conn_data)
 
         elif conn_data.get("METHOD") == "TELNET":
+            print(conn_data.get("HOST"), conn_data.get("HOST") is None)
+            print(conn_data.get("PORT"), conn_data.get("PORT") is None)
+            print(conn_data.get("PASSWORD"), conn_data.get("PASSWORD") is None)
+
             if conn_data.get("HOST") is None or conn_data.get("PORT") is None or conn_data.get("PASSWORD") is None:
                 raise AttributeError("Expected more data.")
             return TELNET_CONNECTION(conn_data)
