@@ -8,7 +8,7 @@ class COM_CONNECTION:
         self.EXECPASS = data["EXECPASS"] if data.get("EXECPASS") else ""
 
     def __str__(self):
-        print(self.METHOD, self.PORT, self.BAUDRATE, self.DEVICE, self.EXECPASS)
+        return f"{self.METHOD}, {self.PORT}, {self.BAUDRATE}, {self.DEVICE}, {self.EXECPASS}"
 
     def getNetmikoConnDict(self):
         return {
@@ -34,7 +34,7 @@ class SSH_CONNECTION:
         self.EXECPASS = data["EXECPASS"] if data.get("EXECPASS") else ""
 
     def __str__(self):
-        print(self.METHOD, self.HOST, self.PORT, self.USERNAME, self.PASSWORD, self.EXECPASS)
+        return f"{self.METHOD}, {self.HOST}, {self.PORT}, {self.USERNAME}, {self.PASSWORD}, {self.EXECPASS}"
 
     def getNetmikoConnDict(self):
         return {
@@ -57,7 +57,7 @@ class TELNET_CONNECTION:
         self.EXECPASS = data["EXECPASS"] if data.get("EXECPASS") else ""
 
     def __str__(self):
-        print(self.METHOD, self.HOST, self.PORT, self.PASSWORD, self.EXECPASS)
+        return f"{self.METHOD}, {self.HOST}, {self.PORT}, {self.PASSWORD}, {self.EXECPASS}"
 
     def getNetmikoConnDict(self):
         return {
