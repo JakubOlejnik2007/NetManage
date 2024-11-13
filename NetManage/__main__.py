@@ -46,6 +46,10 @@ def read_config(connection: str, output_file: str | None, show_config: bool | No
 
 def create_connection(name, output, method, device, ip, port, username, password, exec, baudrate):
     try:
+        print(method, port, baudrate)
+        print(method, "COM", method == "COM")
+        print((method == "COM" and port is not None and baudrate is not None))
+
         if not((method == "COM" and port is not None and baudrate is not None) or ((method == "SSH" or method == "TELNET") and ip is not None and port is not None and (username is not None or method == "TELNET") and password is not None)):
             raise AttributeError("Method must be either COM or SSH or TELNET and certain data need to be provided.")
         create_nmconn(name, output, method, device, ip, port, username, password, exec, baudrate)
@@ -70,7 +74,7 @@ def test_connection(connectionFile):
         print("Error: wrong login or password")
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error 21: {e}")
 
 def main():
     parser = argparse.ArgumentParser(description='NetManage')
@@ -91,7 +95,7 @@ def main():
     parser_create_connection.add_argument('-d', '--device', type=str, required=True, help='Device_type z bilbioteki netmiko')
     parser_create_connection.add_argument('-i', '--ip', type=str, required=False, help='[SSH/TELNET] Host')
     parser_create_connection.add_argument('-po', '--port', type=str, required=False, help='[SSH/TELNET/COM] PORT')
-    parser_create_connection.add_argument('-b', '--baudrate', type=int, required=False, help='[COM] Baudrate')
+    parser_create_connection.add_argument('-b', '--baudrate', type=str, required=False, help='[COM] Baudrate')
     parser_create_connection.add_argument('-u', '--username', type=str, required=False, help='[SSH/TELNET] Username')
     parser_create_connection.add_argument('-pa', '--password', type=str, required=False, help='[SSH/TELNET] Password')
     parser_create_connection.add_argument('-e', '--exec', type=str, required=False, help='[SSH/TELNET/COM] EXEC')

@@ -1,5 +1,6 @@
 class COM_CONNECTION:
     def __init__(self, data: dict):
+        self.NAME = data["NAME"]
         self.METHOD = "COM"
         self.PORT = data["PORT"]
         self.BAUDRATE = data["BAUDRATE"]
@@ -23,6 +24,7 @@ class COM_CONNECTION:
 
 class SSH_CONNECTION:
     def __init__(self, data: dict):
+        self.NAME = data["NAME"]
         self.METHOD = data["METHOD"]
         self.HOST = data["HOST"]
         self.PORT = data["PORT"]
@@ -46,6 +48,7 @@ class SSH_CONNECTION:
 
 class TELNET_CONNECTION:
     def __init__(self, data: dict):
+        self.NAME = data["NAME"]
         self.METHOD = data["METHOD"]
         self.HOST = data["HOST"]
         self.PORT = data["PORT"]
