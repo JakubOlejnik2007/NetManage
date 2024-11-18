@@ -1,6 +1,6 @@
 import argparse
 from netmiko import ConnectHandler, NetmikoTimeoutException, NetmikoAuthenticationException
-from utils import SSH_CONNECTION, TELNET_CONNECTION, COM_CONNECTION, TFTP_CONNECTION, read_nmconn, create_nmconn
+from utils.NMCONN_file import read_nmconn, create_nmconn
 
 
 def read_config(connection: str, output_file: str | None, show_config: bool | None):
