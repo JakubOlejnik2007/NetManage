@@ -1,9 +1,9 @@
 -- META
 NAME: SET HOSTNAME
 TYPE: CONFIG
--- COMPATIBILITY
+-- COMMANDS
 hostname {hostname}
--- DEVICE
+-- DEVICES
 cisco_ios
 cisco_xe
 cisco_asa
@@ -16,4 +16,4 @@ dell_force10
 brocade
 huawei
 -- INPUTS
-TEXT hostname
+TEXT;hostname;Nazwa hosta:
