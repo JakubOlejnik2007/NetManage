@@ -1,6 +1,9 @@
 import argparse
 from netmiko import ConnectHandler, NetmikoTimeoutException, NetmikoAuthenticationException
-from utils.NMCONN_file import read_nmconn, create_nmconn
+
+from NetManage.utils.NMCOMM_file import write_NMCOMM
+from NetManage.utils.commands import COMMAND, INPUT
+from NetManage.utils.NMCONN_file import read_nmconn, create_nmconn
 
 
 def read_config(connection: str, output_file: str | None, show_config: bool | None):
@@ -58,6 +61,41 @@ def create_connection(name, output, method, device, ip, port, username, password
         print(e)
         print("Fail")
 
+def create_command(name, output, type, commands: str, devices:str, inputs:str):
+
+    def transform_section(section_str: str) -> list[str]:
+        return section_str.split("\n")
+
+    try:
+        print(name, output, type ,commands, devices, inputs)
+
+        meta_section = {
+            "NAME": name,
+            "TYPE": type,
+        }
+
+        commands_section = transform_section(commands)
+
+        devices_section = transform_section(devices)
+
+        inputs_section = []
+
+        for inpt in inputs.split("\n"):
+            temp = INPUT()
+            temp.read(inpt)
+            inputs_section.append(temp)
+
+
+        command_to_write = COMMAND(meta_section, commands_section, devices_section, inputs_section)
+
+        write_NMCOMM(output, command_to_write)
+
+
+        print("Success")
+    except Exception as e:
+        print(e)
+        print("Fail")
+
 def test_connection(connectionFile):
     conn = read_nmconn(connectionFile)
     connection_data = conn.getNetmikoConnDict()
@@ -105,6 +143,16 @@ def main():
     parser_test_connection = subparsers.add_parser('test-conn', help='Test connection')
     parser_test_connection.add_argument('-c', '--connection', type=str, required=True, help='Path to .nmconn file')
 
+    # create .nmcomm file
+
+    parser_create_command = subparsers.add_parser('create-comm', help='Create command')
+    parser_create_command.add_argument('-n', '--name', type=str, required=True, help='Command name')
+    parser_create_command.add_argument('-o', '--output', type=str, required=True, help='Path to output .nmcomm file')
+    parser_create_command.add_argument('-t', '--type', type=str, required=True, help='Command type')
+    parser_create_command.add_argument('-c', '--commands', type=str, required=True, help='Command\'s lines')
+    parser_create_command.add_argument('-d', '--devices', type=str, required=True, help='Command\'s devices')
+    parser_create_command.add_argument('-i', '--inputs', type=str, required=True, help='Command\'s inputs')
+
     args = parser.parse_args()
 
     if args.command == "read-config":
@@ -121,6 +169,9 @@ def main():
         create_connection(args.name, args.output, args.method, args.device, args.ip, args.port, args.username, args.password, args.exec, args.baudrate)
     elif args.command == "test-conn":
         test_connection(args.connection)
+    elif args.command == "create-comm":
+        create_command(args.name, args.output, args.type, args.commands, args.devices, args.inputs)
+
     else:
         parser.print_help()
 
